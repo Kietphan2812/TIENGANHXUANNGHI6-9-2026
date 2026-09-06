@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHỦ NHẬT TIỆC VỜI NÍ NHỈ</title>
+  <style>
+    :root {
+      --navy: #1b2432;
+      --navy-2: #232e40;
+      --yellow: #f4c531;
+      --pink: #b6579a;
+      --pink-dark: #a04b8a;
+      --green: #3fae5a;
+      --red: #d9534f;
+      --text: #f2f2f2;
+      --muted: #c7cdd6;
+      --bg-outer: #c6de2a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-outer);
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 720px;
+      background: var(--navy);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: var(--navy);
+      padding: 22px 20px 14px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    header h1 {
+      color: var(--text);
+      font-size: 1.5rem;
+      letter-spacing: 0.5px;
+      margin: 0 0 14px;
+      font-weight: 800;
+    }
+
+    .timer-bar {
+      background: var(--yellow);
+      color: #1b2432;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .progress-wrap {
+      padding: 10px 20px 0;
+    }
+
+    .progress-track {
+      background: #2c3648;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: var(--green);
+      height: 100%;
+      width: 0%;
+      transition: width .3s ease;
+    }
+
+    .progress-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 6px 2px 0;
+      text-align: right;
+    }
+
+    main {
+      padding: 16px 16px 8px;
+    }
+
+    .qcard {
+      background: var(--pink);
+      border-radius: 14px;
+      padding: 16px 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .qcard h3 {
+      color: #fff;
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .qcard .qnum {
+      opacity: 0.85;
+      font-weight: 600;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      padding: 10px 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, transform .1s ease;
+      user-select: none;
+    }
+
+    .option:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .option.selected {
+      background: rgba(244, 197, 49, 0.22);
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 1px var(--yellow) inset;
+    }
+
+    .option.selected span {
+      font-weight: 700;
+    }
+
+    .option input {
+      accent-color: #fff;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      pointer-events: none;
+    }
+
+    .option span {
+      color: #fdfdfd;
+      font-size: 0.98rem;
+    }
+
+    .option.correct {
+      background: rgba(63, 174, 90, 0.35);
+      border-color: var(--green);
+      box-shadow: 0 0 0 1px var(--green) inset;
+    }
+
+    .option.wrong {
+      background: rgba(217, 83, 79, 0.35);
+      border-color: var(--red);
+      box-shadow: 0 0 0 1px var(--red) inset;
+    }
+
+    .option.disabled {
+      cursor: default;
+    }
+
+    #result-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--navy-2);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #33405a;
+    }
+
+    #result-bar .score {
+      color: var(--yellow);
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    #submit-btn {
+      background: var(--yellow);
+      border: none;
+      color: #1b2432;
+      font-weight: 800;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    #submit-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    #restart-btn {
+      display: none;
+      background: var(--navy-2);
+      color: var(--text);
+      border: 1px solid var(--yellow);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .snowflake {
+      position: absolute;
+      top: -10%;
+      color: rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+      font-size: 14px;
+      animation-name: snowfall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+    }
+
+    @keyframes snowfall {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+      }
+
+      25% {
+        transform: translateY(25vh) translateX(12px) rotate(90deg);
+      }
+
+      50% {
+        transform: translateY(55vh) translateX(-10px) rotate(180deg);
+      }
+
+      75% {
+        transform: translateY(80vh) translateX(14px) rotate(270deg);
+      }
+
+      100% {
+        transform: translateY(115vh) translateX(0) rotate(360deg);
+      }
+    }
+
+    #snow-layer {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Nhạc nền -->
+  <audio id="bgMusic" src="nhac1.mp3" loop preload="auto"></audio>
+
+  <div id="snow-layer"></div>
+  <div id="app">
+    <header>
+      <h1>CHỦ NHẬT TIỆC VỜI NÍ NHỈ</h1>
+      <div class="timer-bar">⏱ Thời gian cho ní chiến đấu: <span id="timer">10:00</span></div>
+    </header>
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">0/101 đã trả lời</div>
+    </div>
+    <main id="quiz"></main>
+    <div id="result-bar">
+      <div>
+        <div class="score" id="scoreLabel">Điểm: 0/101</div>
+        <div id="emailStatus" style="font-size:0.78rem;color:#c7cdd6;margin-top:4px;"></div>
+      </div>
+      <div>
+        <button id="submit-btn">Nộp bài</button>
+        <button id="restart-btn">Làm lại</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const BASE_QUESTIONS = [{ "word": "Able", "options": ["cũng vậy", "có thể", "điều kiện", "hành động"], "correct": 1 }, { "word": "Abandon", "options": ["bỏ", "cho phép", "nấu ăn", "và"], "correct": 0 }, { "word": "About", "options": ["khoảng, về", "bầu không khí", "thêm", "hành động"], "correct": 0 }, { "word": "Above", "options": ["xem xét, coi như", "đến", "khẳng định", "lên, trên"], "correct": 3 }, { "word": "Act", "options": ["lạnh", "hành động", "có thể", "tốt nhất"], "correct": 1 }, { "word": "Add", "options": ["động vật", "bận", "thêm", "tốt nhất"], "correct": 2 }, { "word": "Afraid", "options": ["bầu không khí", "sợ", "anh trai, em trai", "tất cả"], "correct": 1 }, { "word": "After", "options": ["leo trèo", "sau", "thẻ, thiệp", "thêm"], "correct": 1 }, { "word": "Again", "options": ["đằng sau", "đám mây", "lại", "hoàn thành"], "correct": 2 }, { "word": "Age", "options": ["tiếp tục", "lại", "tuổi", "thêm"], "correct": 2 }, { "word": "Ago", "options": ["xấu xa", "trước đây", "tất cả", "anh trai, em trai"], "correct": 1 }, { "word": "Agree", "options": ["câu trả lời", "đồng ý", "thùng, hộp", "bánh mì"], "correct": 1 }, { "word": "Air", "options": ["mát mẻ", "bầu không khí", "kết nối", "giá, chi phí"], "correct": 1 }, { "word": "All", "options": ["leo trèo", "câu trả lời", "bờ", "tất cả"], "correct": 3 }, { "word": "Allow", "options": ["điều kiện", "cho phép", "khẳng định", "góc"], "correct": 1 }, { "word": "Also", "options": ["sau", "cũng vậy", "xấu xa", "hành động"], "correct": 1 }, { "word": "Always", "options": ["luôn luôn", "đứa trẻ", "lại", "sạch sẽ"], "correct": 0 }, { "word": "Among", "options": ["thẻ, thiệp", "thuyền", "ở giữa", "kết nối"], "correct": 2 }, { "word": "And", "options": ["bờ", "khẳng định", "và", "leo trèo"], "correct": 2 }, { "word": "Anger", "options": ["mua", "tức giận", "thế kỉ", "đốt cháy"], "correct": 1 }, { "word": "Animal", "options": ["động vật", "đồng ý", "cho phép", "sợ"], "correct": 0 }, { "word": "Answer", "options": ["câu trả lời", "đóng", "cắm trại", "mát mẻ"], "correct": 0 }, { "word": "Appear", "options": ["cái ghế", "đóng", "xuất hiện", "chọn lựa"], "correct": 2 }, { "word": "Apple", "options": ["mát mẻ", "cho phép", "quả táo", "leo trèo"], "correct": 2 }, { "word": "Area", "options": ["xe ô tô", "cho phép", "diện tích, khu vực", "đằng sau"], "correct": 2 }, { "word": "Arrange", "options": ["sắp xếp", "vòng tròn", "xuất hiện", "tin tưởng"], "correct": 0 }, { "word": "Arrive", "options": ["cột", "đến", "kết nối", "vòng tròn"], "correct": 1 }, { "word": "Art", "options": ["nghệ thuật", "quần áo", "chọn lựa", "động vật"], "correct": 0 }, { "word": "Baby", "options": ["đứa trẻ", "mèo", "khoảng, về", "cho phép"], "correct": 0 }, { "word": "Back", "options": ["sạch sẽ", "quả bóng", "trở lại", "sau"], "correct": 2 }, { "word": "Bad", "options": ["lại", "xấu xa", "luôn luôn", "leo trèo"], "correct": 1 }, { "word": "Ball", "options": ["câu trả lời", "tin tưởng", "đám mây", "quả bóng"], "correct": 3 }, { "word": "Bank", "options": ["máu", "bờ", "đốt cháy", "điều khiển"], "correct": 1 }, { "word": "Beauty", "options": ["đứa trẻ", "vẻ đẹp", "quả bóng", "cũng vậy"], "correct": 1 }, { "word": "Believe", "options": ["tin tưởng", "trở lại", "lạnh", "đám mây"], "correct": 0 }, { "word": "Basic", "options": ["trở lại", "sau", "nền tảng", "hoàn thành"], "correct": 2 }, { "word": "Best", "options": ["tuổi", "con gà", "tốt nhất", "xấu xa"], "correct": 2 }, { "word": "Before", "options": ["luôn luôn", "quần áo", "nghệ thuật", "đằng trước"], "correct": 3 }, { "word": "Behind", "options": ["đằng sau", "diện tích, khu vực", "bầu không khí", "gọi"], "correct": 0 }, { "word": "Bed", "options": ["cắm trại", "thùng, hộp", "gọi", "cái giường"], "correct": 3 }, { "word": "Blood", "options": ["kết nối", "xem xét, coi như", "máu", "nấu ăn"], "correct": 2 }, { "word": "Begin", "options": ["quả bóng", "bắt đầu", "bận", "tất cả"], "correct": 1 }, { "word": "Big", "options": ["to lớn", "ở giữa", "cắm trại", "quả táo"], "correct": 0 }, { "word": "Be", "options": ["thủ đô", "đám mây", "thì là", "tuổi"], "correct": 2 }, { "word": "Busy", "options": ["đồng ý", "câu trả lời", "xấu xa", "bận"], "correct": 3 }, { "word": "But", "options": ["sau", "nghệ thuật", "nhưng", "đốt cháy"], "correct": 2 }, { "word": "Box", "options": ["cả hai", "thùng, hộp", "vẻ đẹp", "thẻ, thiệp"], "correct": 1 }, { "word": "Bought", "options": ["mua", "đằng trước", "tức giận", "diện tích, khu vực"], "correct": 0 }, { "word": "Bread", "options": ["sau", "máu", "sợ", "bánh mì"], "correct": 3 }, { "word": "Brother", "options": ["anh trai, em trai", "trước đây", "sau", "con gà"], "correct": 0 }, { "word": "Both", "options": ["xấu xa", "cả hai", "đốt cháy", "nấu ăn"], "correct": 1 }, { "word": "Boat", "options": ["thuyền", "thêm", "đóng", "thế kỉ"], "correct": 0 }, { "word": "Burn", "options": ["đốt cháy", "đến", "vẻ đẹp", "điều khiển"], "correct": 0 }, { "word": "Call", "options": ["cả hai", "gọi", "luôn luôn", "điều khiển"], "correct": 1 }, { "word": "Chance", "options": ["bỏ", "thẻ, thiệp", "sự may rủi", "tuổi"], "correct": 2 }, { "word": "Camp", "options": ["vẻ đẹp", "cắm trại", "vòng tròn", "luôn luôn"], "correct": 1 }, { "word": "Car", "options": ["mua", "tốt nhất", "động vật", "xe ô tô"], "correct": 3 }, { "word": "Capital", "options": ["thủ đô", "xem xét, coi như", "chọn lựa", "cột"], "correct": 0 }, { "word": "Care", "options": ["tất cả", "sự chăm sóc", "tiếp tục", "ở giữa"], "correct": 1 }, { "word": "Card", "options": ["tức giận", "đám mây", "thẻ, thiệp", "tin tưởng"], "correct": 2 }, { "word": "Chair", "options": ["thì là", "đến", "cái ghế", "mát mẻ"], "correct": 2 }, { "word": "Certain", "options": ["đồng ý", "bờ", "sợ", "chắc chắn"], "correct": 3 }, { "word": "Check", "options": ["kiểm tra", "to lớn", "có thể", "luôn luôn"], "correct": 0 }, { "word": "Cat", "options": ["sự may rủi", "khẳng định", "mèo", "đám mây"], "correct": 2 }, { "word": "Catch", "options": ["quần áo", "nắm lấy", "tức giận", "góc"], "correct": 1 }, { "word": "Circle", "options": ["vòng tròn", "cắm trại", "luôn luôn", "thêm"], "correct": 0 }, { "word": "Chicken", "options": ["con gà", "nhưng", "mát mẻ", "đến"], "correct": 0 }, { "word": "Character", "options": ["tính cách", "đốt cháy", "nhưng", "khẳng định"], "correct": 0 }, { "word": "Choose", "options": ["xuất hiện", "chọn lựa", "lên, trên", "đốt cháy"], "correct": 1 }, { "word": "Climb", "options": ["điều khiển", "leo trèo", "đốt cháy", "quả bóng"], "correct": 1 }, { "word": "Clothe", "options": ["cái ghế", "quần áo", "bánh mì", "hành động"], "correct": 1 }, { "word": "Cloud", "options": ["đám mây", "trở lại", "bận", "cái giường"], "correct": 0 }, { "word": "Claim", "options": ["khẳng định", "nền tảng", "to lớn", "thuyền"], "correct": 0 }, { "word": "Clean", "options": ["vòng tròn", "sạch sẽ", "kết nối", "thuyền"], "correct": 1 }, { "word": "Collect", "options": ["xuất hiện", "sưu tầm", "vẻ đẹp", "thế kỉ"], "correct": 1 }, { "word": "Century", "options": ["thế kỉ", "đóng", "cắm trại", "bận"], "correct": 0 }, { "word": "Cold", "options": ["lạnh", "sạch sẽ", "anh trai, em trai", "diện tích, khu vực"], "correct": 0 }, { "word": "Close", "options": ["có thể", "chọn lựa", "đóng", "con gà"], "correct": 2 }, { "word": "Come", "options": ["nấu ăn", "lại", "đến", "thì là"], "correct": 2 }, { "word": "Column", "options": ["đằng sau", "cái giường", "nắm lấy", "cột"], "correct": 3 }, { "word": "Compare", "options": ["quần áo", "so sánh", "giá, chi phí", "đằng trước"], "correct": 1 }, { "word": "Complete", "options": ["điều khiển", "hoàn thành", "nấu ăn", "bánh mì"], "correct": 1 }, { "word": "Condition", "options": ["điều kiện", "thuyền", "quần áo", "có thể"], "correct": 0 }, { "word": "Connect", "options": ["cắm trại", "kết nối", "sưu tầm", "đóng"], "correct": 1 }, { "word": "Consider", "options": ["nấu ăn", "xe ô tô", "nghệ thuật", "xem xét, coi như"], "correct": 3 }, { "word": "Continue", "options": ["trước đây", "tiếp tục", "xem xét, coi như", "tốt nhất"], "correct": 1 }, { "word": "Control", "options": ["điều khiển", "đứa trẻ", "nấu ăn", "cái giường"], "correct": 0 }, { "word": "Cook", "options": ["nấu ăn", "cái ghế", "quả bóng", "thêm"], "correct": 0 }, { "word": "Cool", "options": ["so sánh", "diện tích, khu vực", "sạch sẽ", "mát mẻ"], "correct": 3 }, { "word": "Corner", "options": ["kết nối", "và", "góc", "quả bóng"], "correct": 2 }, { "word": "Cost", "options": ["xuất hiện", "góc", "đứa trẻ", "giá, chi phí"], "correct": 3 }, { "word": "Could", "options": ["có thể", "đốt cháy", "sắp xếp", "thế kỉ"], "correct": 0 }, { "word": "Count", "options": ["bầu không khí", "đếm, tính", "bờ", "cái ghế"], "correct": 1 }, { "word": "Country", "options": ["xe ô tô", "máu", "đất nước, quốc gia", "tuổi"], "correct": 2 }, { "word": "Cow", "options": ["con bò", "sạch sẽ", "nghệ thuật", "thẻ, thiệp"], "correct": 0 }, { "word": "Create", "options": ["tin tưởng", "cho phép", "kết nối", "sáng tạo"], "correct": 3 }, { "word": "Dad", "options": ["bố, ba, cha", "bóng tối", "ngày", "sự nguy hiểm"], "correct": 0 }, { "word": "Dance", "options": ["sự nguy hiểm", "nhảy", "bố, ba, cha", "ngày"], "correct": 1 }, { "word": "Danger", "options": ["ngày", "bóng tối", "sự nguy hiểm", "nhảy"], "correct": 2 }, { "word": "Dark", "options": ["bố, ba, cha", "bóng tối", "sự nguy hiểm", "ngày"], "correct": 1 }, { "word": "Day", "options": ["ngày", "nhảy", "bóng tối", "bố, ba, cha"], "correct": 0 }];
+
+    let englishVoice = null;
+    function pickEnglishVoice() {
+      if (!('speechSynthesis' in window)) return;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || !voices.length) return;
+      englishVoice =
+        voices.find(v => /en-US/i.test(v.lang) && /Google|Natural|Microsoft/i.test(v.name)) ||
+        voices.find(v => /en-US/i.test(v.lang)) ||
+        voices.find(v => /^en/i.test(v.lang)) ||
+        null;
+    }
+    if ('speechSynthesis' in window) {
+      pickEnglishVoice();
+      window.speechSynthesis.onvoiceschanged = pickEnglishVoice;
+    }
+
+    function speakWord(word) {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(word);
+        utter.lang = 'en-US';
+        utter.rate = 0.9;
+        if (englishVoice) utter.voice = englishVoice;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        // Trình duyệt không hỗ trợ phát âm - bỏ qua lặng lẽ
+      }
+    }
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildShuffledQuestions() {
+      return shuffleArray(BASE_QUESTIONS).map(q => {
+        const optionOrder = shuffleArray(q.options.map((opt, idx) => ({ opt, idx })));
+        const newOptions = optionOrder.map(o => o.opt);
+        const newCorrect = optionOrder.findIndex(o => o.idx === q.correct);
+        return { word: q.word, options: newOptions, correct: newCorrect };
+      });
+    }
+
+    let QUESTIONS = buildShuffledQuestions();
+
+    const MEANING_TO_WORD = {};
+    BASE_QUESTIONS.forEach(q => {
+      MEANING_TO_WORD[q.options[q.correct]] = q.word;
+    });
+
+    const quizEl = document.getElementById('quiz');
+    const progressFill = document.getElementById('progressFill');
+    const progressLabel = document.getElementById('progressLabel');
+    const scoreLabel = document.getElementById('scoreLabel');
+    const submitBtn = document.getElementById('submit-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const timerEl = document.getElementById('timer');
+
+    let answers = new Array(QUESTIONS.length).fill(null);
+    let submitted = false;
+
+    function render() {
+      quizEl.innerHTML = '';
+      QUESTIONS.forEach((q, qi) => {
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        const h3 = document.createElement('h3');
+        h3.innerHTML = '<span class="qnum">Câu ' + (qi + 1) + ':</span> ' + q.word;
+        card.appendChild(h3);
+
+        q.options.forEach((opt, oi) => {
+          const label = document.createElement('label');
+          label.className = 'option';
+          if (answers[qi] === oi) label.classList.add('selected');
+          label.dataset.qi = qi;
+          label.dataset.oi = oi;
+
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'q' + qi;
+          input.value = oi;
+          if (answers[qi] === oi) input.checked = true;
+
+          const span = document.createElement('span');
+          const letter = String.fromCharCode(65 + oi);
+          span.textContent = letter + '. ' + opt;
+
+          label.appendChild(input);
+          label.appendChild(span);
+          label.addEventListener('click', (e) => {
+            if (submitted) return;
+            answers[qi] = oi;
+            updateProgress();
+            render();
+            const clickedMeaning = opt;
+            const englishWord = MEANING_TO_WORD[clickedMeaning] || q.word;
+            speakWord(englishWord);
+          });
+          card.appendChild(label);
+        });
+        quizEl.appendChild(card);
+      });
+
+      if (submitted) {
+        document.querySelectorAll('.option').forEach(el => {
+          const qi = +el.dataset.qi, oi = +el.dataset.oi;
+          el.classList.add('disabled');
+          el.classList.remove('selected');
+          if (oi === QUESTIONS[qi].correct) {
+            el.classList.add('correct');
+          } else if (answers[qi] === oi) {
+            el.classList.add('wrong');
+          }
+        });
+      }
+    }
+
+    function updateProgress() {
+      const answered = answers.filter(a => a !== null).length;
+      const pct = (answered / QUESTIONS.length) * 100;
+      progressFill.style.width = pct + '%';
+      progressLabel.textContent = answered + '/' + QUESTIONS.length + ' đã trả lời';
+    }
+
+    function grade() {
+      let score = 0;
+      answers.forEach((a, i) => { if (a === QUESTIONS[i].correct) score++; });
+      return score;
+    }
+
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xojoynke';
+    let quizStartTime = Date.now();
+
+    function formatTimeSpent(ms) {
+      const totalSec = Math.round(ms / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return m + ' phút ' + s + ' giây';
+    }
+
+    function formatSubmittedNow() {
+      const d = new Date();
+      const hh = d.getHours().toString().padStart(2, '0');
+      const mm = d.getMinutes().toString().padStart(2, '0');
+      const dd = d.getDate();
+      const mo = d.getMonth() + 1;
+      const yy = d.getFullYear();
+      return hh + ':' + mm + ' ' + dd + '/' + mo + '/' + yy;
+    }
+
+    function submitViaHiddenIframe(fields) {
+      return new Promise((resolve) => {
+        let iframe = document.getElementById('formspree-fallback-iframe');
+        if (!iframe) {
+          iframe = document.createElement('iframe');
+          iframe.id = 'formspree-fallback-iframe';
+          iframe.name = 'formspree-fallback-iframe';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+        }
+        const form = document.createElement('form');
+        form.action = FORMSPREE_ENDPOINT;
+        form.method = 'POST';
+        form.target = 'formspree-fallback-iframe';
+        form.style.display = 'none';
+        Object.entries(fields).forEach(([k, v]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = k;
+          input.value = v;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        let done = false;
+        iframe.onload = () => {
+          if (done) return;
+          done = true;
+          form.remove();
+          resolve(true);
+        };
+        form.submit();
+        setTimeout(() => {
+          if (done) return;
+          done = true;
+          form.remove();
+          resolve(true);
+        }, 4000);
+      });
+    }
+
+    async function sendResultEmail(score, total, percentage, timeSpentMs) {
+      const statusEl = document.getElementById('emailStatus');
+      statusEl.textContent = 'Đang gửi kết quả qua email...';
+      statusEl.style.color = '#c7cdd6';
+
+      const fields = {
+        score: score,
+        total: total,
+        percentage: percentage,
+        time_spent: formatTimeSpent(timeSpentMs),
+        submitted: formatSubmittedNow(),
+        _subject: 'New quiz submission - Điểm: ' + score + '/' + total
+      };
+
+      try {
+        const fd = new FormData();
+        Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
+        const res = await fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: fd
+        });
+        if (res.ok) {
+          statusEl.innerHTML = '✔ Đã gửi kết quả về email!';
+          statusEl.style.color = '#3fae5a';
+          return;
+        }
+        throw new Error('HTTP ' + res.status);
+      } catch (err) {
+        statusEl.textContent = 'Không gửi được trực tiếp, đang thử cách khác...';
+        try {
+          await submitViaHiddenIframe(fields);
+          statusEl.innerHTML = '✔ Đã gửi yêu cầu kết quả (phương án dự phòng). Kiểm tra email trong vài phút.';
+          statusEl.style.color = '#3fae5a';
+        } catch (err2) {
+          statusEl.innerHTML = '⚠ Không thể gửi email tự động. <button id="retryEmailBtn" style="text-decoration:underline;background:none;border:none;color:#f4c531;cursor:pointer;padding:0;font-size:0.78rem;">Thử lại</button>';
+          statusEl.style.color = '#d9534f';
+          const retryBtn = document.getElementById('retryEmailBtn');
+          if (retryBtn) {
+            retryBtn.addEventListener('click', () => sendResultEmail(score, total, percentage, timeSpentMs));
+          }
+        }
+      }
+    }
+
+    submitBtn.addEventListener('click', () => {
+      submitted = true;
+      const score = grade();
+      const total = QUESTIONS.length;
+      const percentage = Math.round((score / total) * 100);
+      const timeSpentMs = Date.now() - quizStartTime;
+      scoreLabel.textContent = 'Điểm: ' + score + '/' + total;
+      submitBtn.style.display = 'none';
+      restartBtn.style.display = 'inline-block';
+      render();
+      clearInterval(timerInterval);
+      sendResultEmail(score, total, percentage, timeSpentMs);
+    });
+
+    restartBtn.addEventListener('click', () => {
+      QUESTIONS = buildShuffledQuestions();
+      answers = new Array(QUESTIONS.length).fill(null);
+      submitted = false;
+      submitBtn.style.display = 'inline-block';
+      submitBtn.disabled = false;
+      restartBtn.style.display = 'none';
+      scoreLabel.textContent = 'Điểm: 0/' + QUESTIONS.length;
+      document.getElementById('emailStatus').textContent = '';
+      quizStartTime = Date.now();
+      updateProgress();
+      render();
+      startTimer(10 * 60);
+    });
+
+    // Timer
+    let timerInterval;
+    function startTimer(seconds) {
+      let remaining = seconds;
+      updateTimerDisplay(remaining);
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          remaining = 0;
+          updateTimerDisplay(remaining);
+          clearInterval(timerInterval);
+          if (!submitted) submitBtn.click();
+          return;
+        }
+        updateTimerDisplay(remaining);
+      }, 1000);
+    }
+    function updateTimerDisplay(s) {
+      const m = Math.floor(s / 60).toString().padStart(2, '0');
+      const ss = (s % 60).toString().padStart(2, '0');
+      timerEl.textContent = m + ':' + ss;
+    }
+
+    // Snow decoration - smooth continuous falling snowflakes
+    const snowLayer = document.getElementById('snow-layer');
+    const flakeChars = ['❋', '❄', '❅', '❆', '✻'];
+    for (let i = 0; i < 24; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.textContent = flakeChars[Math.floor(Math.random() * flakeChars.length)];
+      flake.style.left = Math.random() * 100 + '%';
+      flake.style.fontSize = (10 + Math.random() * 12) + 'px';
+      flake.style.opacity = (0.2 + Math.random() * 0.5).toFixed(2);
+      const duration = 10 + Math.random() * 14;
+      flake.style.animationDuration = duration + 's';
+      flake.style.animationDelay = (-Math.random() * duration) + 's';
+      snowLayer.appendChild(flake);
+    }
+
+    render();
+    updateProgress();
+    startTimer(10 * 60);
+
+    // ===== NHẠC NỀN =====
+    const bgMusic = document.getElementById('bgMusic');
+    let musicStarted = false;
+
+    function startMusic() {
+      if (musicStarted) return;
+      bgMusic.volume = 0.45;
+      bgMusic.play().then(() => {
+        musicStarted = true;
+      }).catch(() => { });
+    }
+
+    // Phát nhạc khi click bất kỳ đâu trên trang
+    document.addEventListener('click', function onFirstClick() {
+      startMusic();
+      if (musicStarted) document.removeEventListener('click', onFirstClick);
+    }, { passive: true });
+  </script>
+</body>
+
+</html>
